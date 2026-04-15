@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    @apply bg-surface-950 text-gray-100 font-sans antialiased;
+    scrollbar-width: thin;
+    scrollbar-color: #30363d #0d1117;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d1117;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #484f58;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface-800 border border-surface-700 rounded-xl;
+  }
+  .btn-primary {
+    @apply bg-brand-600 hover:bg-brand-500 text-white font-semibold px-5 py-2.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-400 focus:ring-offset-2 focus:ring-offset-surface-900 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-surface-700 hover:bg-surface-600 text-gray-200 font-semibold px-5 py-2.5 rounded-lg transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-surface-900;
+  }
+  .input {
+    @apply w-full bg-surface-700 border border-surface-600 text-gray-100 placeholder-gray-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-all duration-150;
+  }
+  .label {
+    @apply block text-sm font-medium text-gray-300 mb-1.5;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #2f7ff6 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(47, 127, 246, 0.3);
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── App Tour ─────────────────────────────────────────────────────────────── */
+
+/* Sheet slides up from bottom on mobile */
+.tour-backdrop {
+  animation: fadeIn 0.25s ease-out;
+}
+.tour-sheet {
+  animation: tourSheetIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+@keyframes tourSheetIn {
+  from { opacity: 0; transform: translateY(60px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* Slide transition when navigating between cards */
+.tour-slide {
+  animation: tourSlideIn 0.28s ease-out;
+}
+.tour-slide.enter-right {
+  animation: tourSlideFromRight 0.28s ease-out;
+}
+.tour-slide.enter-left {
+  animation: tourSlideFromLeft 0.28s ease-out;
+}
+@keyframes tourSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes tourSlideFromRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes tourSlideFromLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Emoji animations per slide */
+.tour-emoji {
+  display: inline-block;
+}
+.tour-bounce {
+  animation: tourBounce 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes tourBounce {
+  0%, 100% { transform: translateY(0); }
+  20%       { transform: translateY(-14px); }
+  40%       { transform: translateY(-6px); }
+  60%       { transform: translateY(-10px); }
+  80%       { transform: translateY(-2px); }
+}
+
+.tour-pump {
+  animation: tourPump 0.8s ease-in-out both;
+}
+@keyframes tourPump {
+  0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  50%  { transform: scale(1.25) rotate(5deg); }
+  75%  { transform: scale(0.95) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.tour-spin {
+  animation: tourSpin 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes tourSpin {
+  0%   { transform: rotate(-180deg) scale(0.5); opacity: 0; }
+  100% { transform: rotate(0deg)    scale(1);   opacity: 1; }
+}
+
+.tour-zap {
+  animation: tourZap 0.6s ease-out both;
+}
+@keyframes tourZap {
+  0%   { transform: scale(0) skewX(-15deg); opacity: 0; }
+  60%  { transform: scale(1.3) skewX(5deg); opacity: 1; }
+  80%  { transform: scale(0.9) skewX(-3deg); }
+  100% { transform: scale(1) skewX(0); }
+}
