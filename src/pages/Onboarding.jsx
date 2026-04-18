@@ -161,19 +161,19 @@ export default function Onboarding() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col">
+    <div className="min-h-dvh bg-surface-950 flex flex-col">
       {/* Header */}
-      <header className="flex items-center gap-3 px-6 py-4 border-b border-surface-700">
+      <header className="flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-surface-700 flex-shrink-0">
         <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
           <Dumbbell size={18} className="text-white" />
         </div>
         <span className="font-bold text-lg">Go-to-Fitness</span>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-10">
-        <div className="w-full max-w-2xl">
+      <div className="flex-1 overflow-y-auto px-4 py-6 sm:py-10">
+        <div className="w-full max-w-2xl mx-auto">
           {/* Step indicator */}
-          <div className="flex items-center justify-center mb-10 gap-0">
+          <div className="flex items-center justify-center mb-8 gap-0">
             {STEPS.map((s, i) => {
               const Icon = s.icon
               const isActive = step === s.id
@@ -199,21 +199,21 @@ export default function Onboarding() {
           </div>
 
           {/* Card */}
-          <div className="card p-6 sm:p-8 animate-slide-up">
+          <div className="card p-4 sm:p-8 animate-slide-up">
             {step === 1 && <StepDetails data={profileData} onChange={setProfileData} errors={errors} toggleCondition={toggleCondition} />}
             {step === 2 && <StepGoals data={goalData} onChange={setGoalData} errors={errors} />}
             {step === 3 && <StepGenerate generating={generating} done={done} onGenerate={handleGenerate} onGo={goToDashboard} />}
 
             {/* Nav buttons */}
             {step < 3 && (
-              <div className="flex gap-3 mt-8">
+              <div className="flex gap-3 mt-6">
                 {step > 1 && (
-                  <button onClick={handleBack} className="btn-secondary flex items-center gap-2">
+                  <button onClick={handleBack} className="btn-secondary flex items-center gap-2 min-h-[48px]">
                     <ChevronLeft size={18} />
                     Back
                   </button>
                 )}
-                <button onClick={handleNext} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                <button onClick={handleNext} className="btn-primary flex-1 flex items-center justify-center gap-2 min-h-[48px]">
                   Continue
                   <ChevronRight size={18} />
                 </button>

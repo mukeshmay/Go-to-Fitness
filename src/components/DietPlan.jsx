@@ -228,15 +228,15 @@ export default function DietPlan() {
 
                   {/* Macros */}
                   {meal.macros && (
-                    <div className="grid grid-cols-4 gap-2 bg-surface-700/40 rounded-xl p-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-surface-700/40 rounded-xl p-3">
                       {[
                         { label: 'Calories', value: meal.macros.cal + ' kcal', color: 'text-orange-400' },
                         { label: 'Protein',  value: meal.macros.protein,        color: 'text-brand-400' },
                         { label: 'Carbs',    value: meal.macros.carbs,          color: 'text-yellow-400' },
                         { label: 'Fat',      value: meal.macros.fat,            color: 'text-pink-400' },
                       ].map(m => (
-                        <div key={m.label} className="text-center">
-                          <p className={`text-xs sm:text-sm font-bold ${m.color}`}>{m.value}</p>
+                        <div key={m.label} className="text-center py-1">
+                          <p className={`text-sm font-bold ${m.color}`}>{m.value}</p>
                           <p className="text-xs text-gray-500 mt-0.5">{m.label}</p>
                         </div>
                       ))}

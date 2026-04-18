@@ -1,5 +1,6 @@
 import { Routes, Route, useNavigate } from 'react-router-dom'
-import { CalendarDays, Salad, Target, Zap, TrendingUp, ChevronRight, Award } from 'lucide-react'
+import { useState } from 'react'
+import { CalendarDays, Salad, Target, Zap, TrendingUp, ChevronRight, Award, LogOut, User } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import BottomNav from '../components/BottomNav'
 import AppTour from '../components/AppTour'
@@ -20,6 +21,58 @@ const GOAL_LABELS = {
   bulk:         'Bulk Up',
 }
 
+function MobileHeader() {
+  const { user, logout } = useApp()
+  const navigate = useNavigate()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const handleLogout = () => {
+    setMenuOpen(false)
+    logout()
+    navigate('/login', { replace: true })
+  }
+
+  const initials = user?.name
+    ? user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+    : '?'
+
+  return (
+    <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-surface-700 bg-surface-900 flex-shrink-0 relative">
+      <span className="font-bold text-white">Go-to-Fitness</span>
+
+      {/* Avatar button */}
+      <button
+        onClick={() => setMenuOpen(o => !o)}
+        className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+      >
+        {initials}
+      </button>
+
+      {/* Dropdown */}
+      {menuOpen && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+          <div className="absolute top-full right-4 mt-1 w-48 bg-surface-800 border border-surface-700 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
+            <div className="px-4 py-3 border-b border-surface-700">
+              <p className="text-xs text-gray-500">Signed in as</p>
+              <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
+            >
+              <LogOut size={15} />
+              Sign out
+            </button>
+          </div>
+        </>
+      )}
+    </header>
+  )
+}
+
 export default function Dashboard() {
   return (
     <div className="flex h-screen overflow-hidden bg-surface-950">
@@ -31,12 +84,10 @@ export default function Dashboard() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center justify-center px-4 py-3 border-b border-surface-700 bg-surface-900 flex-shrink-0">
-          <span className="font-bold text-white">Go-to-Fitness</span>
-        </header>
+        <MobileHeader />
 
         {/* Scrollable content — bottom padding leaves room for bottom nav on mobile */}
-        <main className="flex-1 overflow-y-auto pb-20 lg:pb-0">
+        <main className="flex-1 overflow-y-auto main-mobile-pad lg:pb-0">
           <div className="max-w-2xl lg:max-w-4xl mx-auto px-4 sm:px-6 py-5">
             <Routes>
               <Route index           element={<Overview />} />

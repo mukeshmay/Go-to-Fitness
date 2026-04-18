@@ -5,11 +5,33 @@
 @layer base {
   * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    overflow-x: hidden;
   }
   body {
     @apply bg-surface-950 text-gray-100 font-sans antialiased;
     scrollbar-width: thin;
     scrollbar-color: #30363d #0d1117;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Prevent iOS Safari auto-zoom on input focus (requires font-size >= 16px) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Better touch scrolling on iOS */
+  .overflow-y-auto, main {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure buttons don't shrink tap area */
+  button {
+    touch-action: manipulation;
   }
   ::-webkit-scrollbar {
     width: 6px;
@@ -73,6 +95,16 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Safe area / iPhone home indicator ───────────────────────────────────── */
+.bottom-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Dashboard main content — leave enough room for bottom nav + safe area */
+.main-mobile-pad {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ── App Tour ─────────────────────────────────────────────────────────────── */

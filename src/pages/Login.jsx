@@ -49,7 +49,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-dvh flex">
       {/* Left panel — hero */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-900 via-brand-800 to-surface-950 flex-col justify-between p-12">
         <div className="flex items-center gap-3">
@@ -88,8 +88,8 @@ export default function Login() {
       </div>
 
       {/* Right panel — form */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-surface-950">
-        <div className="w-full max-w-md animate-slide-up">
+      <div className="flex-1 flex items-center justify-center p-5 sm:p-6 bg-surface-950 overflow-y-auto">
+        <div className="w-full max-w-md animate-slide-up py-4">
           {/* Mobile logo */}
           <div className="flex lg:hidden items-center gap-2 mb-8">
             <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">
