@@ -102,7 +102,8 @@ export default function ProteinTracker() {
     return map
   }, [foods])
 
-  const sortedCategories = CATEGORY_ORDER.filter(c => grouped[c])
+  const usesWhey = goals?.usesWhey !== false  // default true for existing users
+  const sortedCategories = CATEGORY_ORDER.filter(c => grouped[c] && (usesWhey || c !== 'Supplement'))
 
   if (!profile || !goals) return <NoProfile />
 

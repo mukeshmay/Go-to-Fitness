@@ -132,22 +132,28 @@ export default function Onboarding() {
       targetWeight: parseFloat(goalData.targetWeight),
       bodyType: goalData.bodyType,
       dietPreference: goalData.dietPreference,
+      usesWhey: true, // default; user can change in Diet Plan settings
     }
 
-    // Simulate generation delay for UX
-    await new Promise(r => setTimeout(r, 2000))
+    // Brief pause so the loading animation renders before state updates
+    await new Promise(r => setTimeout(r, 600))
 
-    const workoutPlan = generateWorkoutPlan(profile, goals)
-    const dietPlan = generateDietPlan(profile, goals)
-    const milestones = generateMilestones(experienceMonths)
+    try {
+      const workoutPlan = generateWorkoutPlan(profile, goals)
+      const dietPlan = generateDietPlan(profile, goals)
+      const milestones = generateMilestones(experienceMonths)
 
-    setProfile(profile)
-    setGoals(goals)
-    setPlan({ workoutPlan, dietPlan })
-    setMilestones(milestones)
+      setProfile(profile)
+      setGoals(goals)
+      setPlan({ workoutPlan, dietPlan })
+      setMilestones(milestones)
 
-    setGenerating(false)
-    setDone(true)
+      setGenerating(false)
+      setDone(true)
+    } catch (err) {
+      console.error('Plan generation failed:', err)
+      setGenerating(false)
+    }
   }
 
   const goToDashboard = () => navigate('/dashboard', { replace: true })
@@ -381,6 +387,7 @@ function StepGoals({ data, onChange, errors }) {
           ))}
         </div>
       </div>
+
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
 import { Salad, Flame, Zap, Droplets, Pill, ChevronDown, ChevronUp, Leaf, Drumstick, CheckCircle2, Circle } from 'lucide-react'
+import { substituteWhey, VEG_MEALS, NON_VEG_MEALS, MEAL_LABELS } from '../utils/dietGenerator'
 
 const MEAL_ICONS = {
   breakfast:   '🌅',
@@ -16,26 +17,39 @@ const TODAY_KEY = new Date().toISOString().split('T')[0]
 
 // Which meals to show per goal — applied at render time so existing stored
 // plans are fixed immediately without needing re-generation.
-const ALLOWED_MEALS = {
-  weight_loss: ['breakfast', 'midMorning', 'lunch', 'postWorkout', 'dinner'],
-  lean:        ['breakfast', 'midMorning', 'lunch', 'postWorkout', 'dinner'],
-  muscle_gain: ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner'],
-  bulk:        ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner', 'lateNight'],
+// lean is direction-aware: lean-bulk gets 6 meals, lean-cut gets 5.
+function getAllowedMeals(primaryGoal, targetWeight, currentWeight) {
+  const weightDiff = (targetWeight || currentWeight) - (currentWeight || 0)
+  if (primaryGoal === 'bulk')        return ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner', 'lateNight']
+  if (primaryGoal === 'muscle_gain') return ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner']
+  if (primaryGoal === 'lean' && weightDiff > 0) return ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner']
+  return ['breakfast', 'midMorning', 'lunch', 'postWorkout', 'dinner']
 }
 
 export default function DietPlan() {
-  const { plan, goals, completedMeals, toggleMeal } = useApp()
+  const { plan, goals, profile, completedMeals, toggleMeal, setGoals } = useApp()
   const [expandedMeal, setExpandedMeal] = useState('breakfast')
 
   if (!plan?.dietPlan) return <EmptyState />
 
   const { dietPlan } = plan
-  const isVeg = dietPlan.dietPreference === 'veg'
-  const primaryGoal = goals?.primaryGoal || 'muscle_gain'
+  const primaryGoal  = goals?.primaryGoal  || 'muscle_gain'
+  const dietPref     = goals?.dietPreference || dietPlan.dietPreference || 'non_veg'
+  const isVeg        = dietPref === 'veg'
+  const usesWhey     = goals?.usesWhey !== false   // default true
 
-  // Filter meals based on goal — fixes old stored plans and new ones alike
-  const allowed = ALLOWED_MEALS[primaryGoal] || ALLOWED_MEALS['muscle_gain']
-  const meals = (dietPlan.meals || []).filter(m => allowed.includes(m.key))
+  // ── Derive meals at render time so both toggles work instantly ────────────
+  const source    = isVeg ? VEG_MEALS : NON_VEG_MEALS
+  const goalKey   = primaryGoal in source ? primaryGoal : 'muscle_gain'
+  const allowed   = getAllowedMeals(primaryGoal, goals?.targetWeight, profile?.weight)
+
+  const meals = allowed.map(key => {
+    const raw = { key, label: MEAL_LABELS[key], ...source[goalKey][key] }
+    return usesWhey ? raw : substituteWhey(raw, isVeg)
+  })
+
+  const toggleWhey   = () => setGoals({ ...goals, usesWhey: !usesWhey })
+  const toggleDiet   = () => setGoals({ ...goals, dietPreference: isVeg ? 'non_veg' : 'veg' })
 
   const doneMeals = completedMeals?.[TODAY_KEY] || []
   const totalMeals = meals.filter(m => m.key !== 'lateNight').length
@@ -60,6 +74,43 @@ export default function DietPlan() {
         }`}>
           {isVeg ? <Leaf size={13} /> : <Drumstick size={13} />}
           {isVeg ? 'Vegetarian' : 'Non-Veg'}
+        </div>
+      </div>
+
+      {/* Preferences row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {/* Veg / Non-veg toggle */}
+        <div className="flex items-center justify-between card px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-gray-300">
+              {isVeg ? '🥦 Vegetarian' : '🍗 Non-Veg'}
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {isVeg ? 'Switch to non-veg meals' : 'Switch to veg meals'}
+            </p>
+          </div>
+          <button
+            onClick={toggleDiet}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${isVeg ? 'bg-emerald-600' : 'bg-orange-600'}`}
+          >
+            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${isVeg ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
+        </div>
+
+        {/* Whey toggle */}
+        <div className="flex items-center justify-between card px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-gray-300">🥤 Whey Protein</p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {usesWhey ? 'Meals include whey scoops' : 'Whole food protein only'}
+            </p>
+          </div>
+          <button
+            onClick={toggleWhey}
+            className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${usesWhey ? 'bg-brand-600' : 'bg-surface-600'}`}
+          >
+            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${usesWhey ? 'translate-x-5' : 'translate-x-0.5'}`} />
+          </button>
         </div>
       </div>
 
@@ -238,12 +289,15 @@ export default function DietPlan() {
           <h3 className="font-semibold text-white text-sm">Recommended Supplements</h3>
         </div>
         <div className="grid sm:grid-cols-2 gap-2">
-          {dietPlan.supplements?.map((supp, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-              <span className="w-1.5 h-1.5 bg-brand-500 rounded-full flex-shrink-0" />
-              {supp}
-            </div>
-          ))}
+          {(dietPlan.supplements || [])
+            .filter(s => usesWhey || !/whey/i.test(s))
+            .concat(!usesWhey ? ['Paneer / Greek Yogurt / Eggs — whole food protein each meal'] : [])
+            .map((supp, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
+                <span className="w-1.5 h-1.5 bg-brand-500 rounded-full flex-shrink-0" />
+                {supp}
+              </div>
+            ))}
         </div>
         <p className="text-xs text-gray-600">Consult a nutritionist before starting any supplements.</p>
       </div>

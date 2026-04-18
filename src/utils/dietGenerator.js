@@ -1,25 +1,97 @@
 // Diet plan generator — based on goal, body weight, and dietary preference (veg / non-veg)
 
-function estimateCalories(weightKg, goal) {
-  // TDEE estimate: weight × 33 for moderate activity (Harris-Benedict × 1.55)
-  const tdee = Math.round(weightKg * 33)
-  // Goal-specific adjustments based on research:
-  // Weight loss: -500 kcal deficit (safe, ~0.5kg/week loss)
-  // Lean: -200 kcal (preserve muscle, slow cut)
-  // Muscle gain: +300 kcal (lean bulk, minimal fat gain)
-  // Bulk: +700 kcal (aggressive surplus for max muscle)
-  const adjustments = { muscle_gain: +300, weight_loss: -500, lean: -200, bulk: +700 }
-  return tdee + (adjustments[goal] || 0)
+// ── TDEE Calculator (Mifflin-St Jeor, gender-neutral average) ─────────────────
+// Male:   10w + 6.25h - 5a + 5
+// Female: 10w + 6.25h - 5a - 161
+// Avg:    10w + 6.25h - 5a - 78  (used since we don't collect gender)
+function calcBMR(weight, height, age) {
+  return Math.round((10 * weight) + (6.25 * height) - (5 * age) - 78)
 }
 
-function estimateProtein(weightKg, goal) {
-  const multipliers = { muscle_gain: 2.2, weight_loss: 2.0, lean: 2.0, bulk: 2.4 }
-  return Math.round(weightKg * (multipliers[goal] || 2.0))
+// Activity multiplier based on training experience
+function activityMultiplier(experienceMonths) {
+  if (experienceMonths < 6)  return 1.375  // beginner  → lightly active
+  if (experienceMonths < 24) return 1.55   // intermediate → moderately active
+  return 1.725                              // advanced  → very active
+}
+
+// ── Calorie target with full edge-case handling ────────────────────────────────
+//
+// Edge cases handled:
+//   lean + wants to GAIN weight  → lean bulk   (+200 kcal surplus)
+//   lean + wants to LOSE weight  → lean cut    (-250 kcal deficit)
+//   lean + at target weight      → recomp      (+75 kcal, near maintenance)
+//   muscle_gain beginner         → smaller surplus (newbie gains work at maintenance)
+//   muscle_gain intermediate+    → +350 kcal clean bulk
+//   bulk at high BMI (>27.5)     → capped at +500 (reduce fat gain risk)
+//   weight_loss underweight      → floored at maintenance (never starve)
+//   any result                   → minimum 1400 kcal floor
+//
+function estimateCalories(profile, goals) {
+  const { weight, height, age, experienceMonths } = profile
+  const { primaryGoal, targetWeight } = goals
+
+  const bmr  = calcBMR(weight, height, age)
+  const tdee = Math.round(bmr * activityMultiplier(experienceMonths))
+
+  const bmi        = weight / ((height / 100) ** 2)
+  const weightDiff = (targetWeight || weight) - weight  // +ve = wants to gain, -ve = lose
+
+  let adjustment = 0
+
+  switch (primaryGoal) {
+    case 'weight_loss':
+      // If somehow target > current (user confused goal), treat as maintenance
+      adjustment = weightDiff > 0 ? 0 : -500
+      break
+
+    case 'lean':
+      // Lean = goal depends entirely on direction of weight target
+      if (weightDiff > 2)       adjustment = +200   // lean bulk (slow gain, stay lean)
+      else if (weightDiff < -2) adjustment = -250   // lean cut  (slow deficit)
+      else                      adjustment = +75    // body recomp (near maintenance)
+      break
+
+    case 'muscle_gain':
+      if (experienceMonths < 6) adjustment = +150   // beginners gain on less surplus
+      else                      adjustment = +350   // clean bulk for intermediate/advanced
+      break
+
+    case 'bulk':
+      // Cap surplus if BMI is already high to avoid excessive fat gain
+      adjustment = bmi > 27.5 ? +500 : +700
+      break
+
+    default:
+      adjustment = +300
+  }
+
+  return Math.max(1400, tdee + adjustment)
+}
+
+// ── Protein target ─────────────────────────────────────────────────────────────
+// Higher protein during deficits preserves muscle; during surplus supports growth.
+function estimateProtein(profile, goals) {
+  const { weight, experienceMonths } = profile
+  const { primaryGoal, targetWeight } = goals
+  const weightDiff = (targetWeight || weight) - weight
+
+  let multiplier
+  switch (primaryGoal) {
+    case 'weight_loss': multiplier = 2.2; break          // high to preserve muscle on cut
+    case 'lean':
+      multiplier = weightDiff > 0 ? 2.0 : 2.2; break    // lean bulk vs lean cut
+    case 'muscle_gain':
+      multiplier = experienceMonths < 6 ? 1.8 : 2.2; break
+    case 'bulk':        multiplier = 2.4; break          // maximum for mass phase
+    default:            multiplier = 2.0
+  }
+  return Math.round(weight * multiplier)
 }
 
 // ── Meal Templates ────────────────────────────────────────────────────────────
 
-const VEG_MEALS = {
+export const VEG_MEALS = {
   muscle_gain: {
     breakfast: {
       name: 'Power Oats + Protein',
@@ -273,7 +345,7 @@ const VEG_MEALS = {
 }
 
 // Non-veg versions
-const NON_VEG_MEALS = {
+export const NON_VEG_MEALS = {
   muscle_gain: {
     breakfast: {
       name: 'Egg & Oat Power Breakfast',
@@ -333,7 +405,7 @@ const NON_VEG_MEALS = {
   },
 }
 
-const MEAL_LABELS = {
+export const MEAL_LABELS = {
   breakfast:   'Breakfast',
   midMorning:  'Mid-Morning Snack',
   lunch:       'Lunch',
@@ -343,35 +415,87 @@ const MEAL_LABELS = {
   lateNight:   'Late Night (Optional)',
 }
 
-// Goal-specific meal counts based on nutrition science:
-// Weight loss: 5 meals (no separate pre-workout or late-night to limit total calories)
-// Lean: 5 meals (moderate deficit, same structure as weight loss)
-// Muscle gain: 6 meals (add pre-workout window for performance)
-// Bulk: 7 meals (maximum eating frequency to hit high caloric surplus)
-const MEAL_ORDER_BY_GOAL = {
-  weight_loss: ['breakfast', 'midMorning', 'lunch', 'postWorkout', 'dinner'],
-  lean:        ['breakfast', 'midMorning', 'lunch', 'postWorkout', 'dinner'],
-  muscle_gain: ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner'],
-  bulk:        ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner', 'lateNight'],
+// Meal counts per goal + direction:
+// - weight_loss          → 5 meals (controlled eating windows)
+// - lean cut             → 5 meals (same as weight loss)
+// - lean bulk / recomp   → 6 meals (needs pre-workout fuel)
+// - muscle_gain          → 6 meals
+// - bulk                 → 7 meals (needs every calorie window)
+function getMealOrder(primaryGoal, targetWeight, currentWeight) {
+  const weightDiff = (targetWeight || currentWeight) - currentWeight
+  if (primaryGoal === 'bulk')        return ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner', 'lateNight']
+  if (primaryGoal === 'muscle_gain') return ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner']
+  if (primaryGoal === 'lean' && weightDiff > 0) return ['breakfast', 'midMorning', 'lunch', 'preWorkout', 'postWorkout', 'dinner']
+  // weight_loss + lean cut → 5 meals
+  return ['breakfast', 'midMorning', 'lunch', 'postWorkout', 'dinner']
+}
+
+// ── Whey substitution ─────────────────────────────────────────────────────────
+// Replaces whey/scoop items with whole-food protein equivalents.
+// Keeps macros roughly accurate by adjusting the macro object.
+const WHEY_SUBS = {
+  veg: {
+    2: { item: '300g low-fat cottage cheese (paneer)', proteinDelta: -8,  calDelta: +80  },
+    1.5: { item: '200g Greek yogurt + 100g paneer',   proteinDelta: -10, calDelta: +60  },
+    1: { item: '200g Greek yogurt',                   proteinDelta: -8,  calDelta: +20  },
+  },
+  non_veg: {
+    2: { item: '4 whole eggs (boiled or scrambled)',   proteinDelta: -20, calDelta: -100 },
+    1.5: { item: '3 boiled eggs + 1 glass whole milk', proteinDelta: -12, calDelta: -30  },
+    1: { item: '3 boiled egg whites + 1 whole egg',    proteinDelta: -8,  calDelta: -40  },
+  },
+}
+
+export function substituteWhey(meal, isVeg) {
+  const hasWhey = meal.items?.some(item => /whey|scoop/i.test(item))
+  if (!hasWhey) return meal
+
+  const side = isVeg ? 'veg' : 'non_veg'
+  let proteinDelta = 0, calDelta = 0
+
+  const newItems = meal.items.map(item => {
+    const scoopMatch = item.match(/(\d+\.?\d*)\s*scoop/i)
+    if (!scoopMatch) return item
+
+    const scoops = parseFloat(scoopMatch[1])
+    const key = scoops >= 2 ? 2 : scoops >= 1.5 ? 1.5 : 1
+    const sub = WHEY_SUBS[side][key]
+    proteinDelta += sub.proteinDelta
+    calDelta     += sub.calDelta
+    return sub.item
+  })
+
+  // Also strip "in water" / "in milk" fragments left behind on postWorkout lines
+  const cleanedItems = newItems.map(i => i.replace(/\s*in water\s*$/i, '').replace(/\s*in milk\s*$/i, ''))
+
+  const macros = meal.macros ? {
+    ...meal.macros,
+    protein: `${Math.max(0, parseInt(meal.macros.protein) + proteinDelta)}g`,
+    cal: Math.max(100, (meal.macros.cal || 0) + calDelta),
+  } : meal.macros
+
+  return {
+    ...meal,
+    items: cleanedItems,
+    macros,
+    tip: meal.tip + ' | Using whole food protein — no whey.',
+  }
 }
 
 export function generateDietPlan(profile, goals) {
   const { weight } = profile
-  const { primaryGoal, dietPreference } = goals
+  const { primaryGoal, targetWeight, dietPreference } = goals
 
-  const targetCal = estimateCalories(weight, primaryGoal)
-  const targetProtein = estimateProtein(weight, primaryGoal)
+  const targetCal     = estimateCalories(profile, goals)
+  const targetProtein = estimateProtein(profile, goals)
 
-  const source = dietPreference === 'veg' ? VEG_MEALS : NON_VEG_MEALS
+  const isVeg = dietPreference === 'veg'
+  const source = isVeg ? VEG_MEALS : NON_VEG_MEALS
   const goalKey = primaryGoal in source ? primaryGoal : 'muscle_gain'
   const meals = source[goalKey]
 
-  const mealOrder = MEAL_ORDER_BY_GOAL[primaryGoal] || MEAL_ORDER_BY_GOAL['muscle_gain']
-  const mealList = mealOrder.map(key => ({
-    key,
-    label: MEAL_LABELS[key],
-    ...meals[key],
-  }))
+  const mealOrder = getMealOrder(primaryGoal, targetWeight, weight)
+  const mealList = mealOrder.map(key => ({ key, label: MEAL_LABELS[key], ...meals[key] }))
 
   const goalTips = {
     weight_loss: [
@@ -380,9 +504,14 @@ export function generateDietPlan(profile, goals) {
       'Eat slowly and chew thoroughly — hunger signals take 20 min to reach the brain.',
       'Track your calories with MyFitnessPal for the first 4 weeks.',
     ],
-    lean: [
-      'Your deficit is mild (~200 kcal) — perfect for maintaining muscle while cutting fat.',
-      'Keep protein high (listed target) to retain every gram of muscle.',
+    lean: (targetWeight || weight) > weight ? [
+      'You\'re in a lean bulk — small +200 kcal surplus to build muscle while staying lean.',
+      'Prioritise compound lifts and high protein to maximise muscle-to-fat gain ratio.',
+      'Expect slow but clean weight gain (~0.2–0.3 kg/week) — this is the goal.',
+      'Weigh yourself weekly; if gaining faster than 0.5 kg/week, reduce calories slightly.',
+    ] : [
+      'You\'re in a lean cut — mild ~250 kcal deficit to drop fat while keeping muscle.',
+      'Keep protein high (listed target) to retain every gram of muscle during the cut.',
       'Cardio 2–3×/week complements the small deficit for visible results.',
       'Weigh yourself weekly (not daily) to track the true trend.',
     ],
@@ -409,7 +538,7 @@ export function generateDietPlan(profile, goals) {
     hydration: primaryGoal === 'weight_loss' || primaryGoal === 'lean'
       ? 'Drink 3–4 litres of water daily. A glass before each meal curbs appetite.'
       : 'Drink 3–4 litres of water daily. 500ml before training for performance.',
-    supplements: dietPreference === 'veg'
+    supplements: isVeg
       ? ['Whey Protein (1–2 scoops/day)', 'Creatine Monohydrate (5g/day)', 'Vitamin B12', 'Vitamin D3', 'Omega-3 (flaxseed/algae oil)']
       : ['Whey Protein (1–2 scoops/day)', 'Creatine Monohydrate (5g/day)', 'Vitamin D3', 'Omega-3 Fish Oil', 'Multivitamin'],
     tips: goalTips[primaryGoal] || goalTips['muscle_gain'],
