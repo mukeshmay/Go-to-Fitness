@@ -1,7 +1,7 @@
 import { useApp } from '../context/AppContext'
 import { useNavigate } from 'react-router-dom'
 import {
-  User, Weight, Ruler, CalendarDays, Target, Salad,
+  User, Mail, Weight, Ruler, CalendarDays, Target, Salad,
   Dumbbell, Zap, Heart, TrendingUp, LogOut, RefreshCw,
   Flame, Activity,
 } from 'lucide-react'
@@ -106,6 +106,10 @@ export default function Profile() {
         </div>
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-white truncate">{user?.name}</h1>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <Mail size={12} className="text-gray-500 flex-shrink-0" />
+            <p className="text-sm text-gray-400 truncate">{user?.email}</p>
+          </div>
           <div className="flex items-center gap-1.5 mt-1">
             <CalendarDays size={12} className="text-gray-500 flex-shrink-0" />
             <p className="text-xs text-gray-500">Member since {memberSince}</p>
