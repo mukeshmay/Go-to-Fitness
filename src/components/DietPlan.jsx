@@ -84,7 +84,7 @@ export default function DietPlan() {
           </div>
           <button
             onClick={toggleDiet}
-            className={`tap-compact relative w-12 h-7 rounded-full transition-colors duration-200 flex-shrink-0 ml-4 ${isVeg ? 'bg-emerald-600' : 'bg-surface-600'}`}
+            className={`tap-compact relative w-12 h-7 rounded-full overflow-hidden transition-colors duration-200 flex-shrink-0 ml-4 ${isVeg ? 'bg-emerald-600' : 'bg-surface-600'}`}
           >
             <span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${isVeg ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
@@ -100,7 +100,7 @@ export default function DietPlan() {
           </div>
           <button
             onClick={toggleWhey}
-            className={`tap-compact relative w-12 h-7 rounded-full transition-colors duration-200 flex-shrink-0 ml-4 ${usesWhey ? 'bg-brand-600' : 'bg-surface-600'}`}
+            className={`tap-compact relative w-12 h-7 rounded-full overflow-hidden transition-colors duration-200 flex-shrink-0 ml-4 ${usesWhey ? 'bg-brand-600' : 'bg-surface-600'}`}
           >
             <span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${usesWhey ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>

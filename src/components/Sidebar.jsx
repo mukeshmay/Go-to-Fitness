@@ -3,13 +3,13 @@ import { Dumbbell, LayoutDashboard, CalendarDays, Salad, Target, BarChart3, Zap,
 import { useApp } from '../context/AppContext'
 
 const NAV = [
+  { to: '/dashboard/profile',    label: 'My Profile',     icon: UserCircle },
   { to: '/dashboard',            label: 'Overview',       icon: LayoutDashboard },
   { to: '/dashboard/workout',    label: 'Workout Plan',   icon: CalendarDays },
   { to: '/dashboard/diet',       label: 'Diet Plan',      icon: Salad },
   { to: '/dashboard/milestones', label: 'Milestones',     icon: Target },
   { to: '/dashboard/protein',    label: 'Protein Tracker',icon: Zap },
   { to: '/dashboard/records',    label: 'Records',        icon: BarChart3 },
-  { to: '/dashboard/profile',    label: 'My Profile',     icon: UserCircle },
 ]
 
 export default function Sidebar({ onClose }) {
@@ -40,7 +40,6 @@ export default function Sidebar({ onClose }) {
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user.email}</p>
             </div>
           </div>
         </div>

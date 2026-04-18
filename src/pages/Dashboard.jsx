@@ -54,11 +54,9 @@ function MobileHeader() {
         <>
           {/* Backdrop */}
           <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-          <div className="absolute top-full right-4 mt-1 w-52 bg-surface-800 border border-surface-700 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
+          <div className="absolute top-full right-4 mt-1 w-48 bg-surface-800 border border-surface-700 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
             <div className="px-4 py-3 border-b border-surface-700">
-              <p className="text-xs text-gray-500">Signed in as</p>
               <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
             <button
               onClick={() => { setMenuOpen(false); navigate('/dashboard/profile') }}
