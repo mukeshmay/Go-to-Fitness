@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Dumbbell, LayoutDashboard, CalendarDays, Salad, Target, BarChart3, Zap, LogOut, ChevronRight } from 'lucide-react'
+import { Dumbbell, LayoutDashboard, CalendarDays, Salad, Target, BarChart3, Zap, LogOut, ChevronRight, UserCircle } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 const NAV = [
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/dashboard/milestones', label: 'Milestones',     icon: Target },
   { to: '/dashboard/protein',    label: 'Protein Tracker',icon: Zap },
   { to: '/dashboard/records',    label: 'Records',        icon: BarChart3 },
+  { to: '/dashboard/profile',    label: 'My Profile',     icon: UserCircle },
 ]
 
 export default function Sidebar({ onClose }) {

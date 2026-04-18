@@ -49,7 +49,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-dvh flex">
+    <div className="min-h-dvh-safe flex">
       {/* Left panel — hero */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-900 via-brand-800 to-surface-950 flex-col justify-between p-12">
         <div className="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
-import { Salad, Flame, Zap, Droplets, Pill, ChevronDown, ChevronUp, Leaf, Drumstick, CheckCircle2, Circle } from 'lucide-react'
+import { Salad, Flame, Zap, Droplets, Pill, ChevronDown, ChevronUp, CheckCircle2, Circle } from 'lucide-react'
 import { substituteWhey, VEG_MEALS, NON_VEG_MEALS, MEAL_LABELS } from '../utils/dietGenerator'
 
 const MEAL_ICONS = {
@@ -60,45 +60,38 @@ export default function DietPlan() {
   return (
     <div className="space-y-5 animate-fade-in pb-6">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white">Diet Plan</h1>
-          <p className="text-gray-400 text-sm mt-0.5">
-            {goals?.primaryGoal?.replace('_', ' ')} · {isVeg ? 'Vegetarian' : 'Non-Veg'}
-          </p>
-        </div>
-        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold flex-shrink-0 ${
-          isVeg
-            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-            : 'bg-orange-500/20 text-orange-300 border-orange-500/30'
-        }`}>
-          {isVeg ? <Leaf size={13} /> : <Drumstick size={13} />}
-          {isVeg ? 'Vegetarian' : 'Non-Veg'}
-        </div>
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold text-white">Diet Plan</h1>
+        <p className="text-gray-400 text-sm mt-0.5">
+          {goals?.primaryGoal?.replace('_', ' ')} ·{' '}
+          <span className={isVeg ? 'text-emerald-400' : 'text-orange-400'}>
+            {isVeg ? '🥦 Vegetarian' : '🍗 Non-Veg'}
+          </span>
+        </p>
       </div>
 
-      {/* Preferences row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+      {/* Preferences row — always stacked to avoid overflow on any phone */}
+      <div className="flex flex-col gap-2.5">
         {/* Veg / Non-veg toggle */}
-        <div className="flex items-center justify-between card px-4 py-3">
+        <div className="flex items-center justify-between card px-4 py-3.5">
           <div>
             <p className="text-sm font-medium text-gray-300">
-              {isVeg ? '🥦 Vegetarian' : '🍗 Non-Veg'}
+              {isVeg ? '🥦 Vegetarian meals' : '🍗 Non-Veg meals'}
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
-              {isVeg ? 'Switch to non-veg meals' : 'Switch to veg meals'}
+              {isVeg ? 'Tap to switch to non-veg' : 'Tap to switch to vegetarian'}
             </p>
           </div>
           <button
             onClick={toggleDiet}
-            className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${isVeg ? 'bg-emerald-600' : 'bg-orange-600'}`}
+            className={`tap-compact relative w-12 h-7 rounded-full transition-colors duration-200 flex-shrink-0 ml-4 ${isVeg ? 'bg-emerald-600' : 'bg-surface-600'}`}
           >
-            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${isVeg ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            <span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${isVeg ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
         </div>
 
         {/* Whey toggle */}
-        <div className="flex items-center justify-between card px-4 py-3">
+        <div className="flex items-center justify-between card px-4 py-3.5">
           <div>
             <p className="text-sm font-medium text-gray-300">🥤 Whey Protein</p>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -107,9 +100,9 @@ export default function DietPlan() {
           </div>
           <button
             onClick={toggleWhey}
-            className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${usesWhey ? 'bg-brand-600' : 'bg-surface-600'}`}
+            className={`tap-compact relative w-12 h-7 rounded-full transition-colors duration-200 flex-shrink-0 ml-4 ${usesWhey ? 'bg-brand-600' : 'bg-surface-600'}`}
           >
-            <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${usesWhey ? 'translate-x-5' : 'translate-x-0.5'}`} />
+            <span className={`absolute top-1 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${usesWhey ? 'translate-x-6' : 'translate-x-1'}`} />
           </button>
         </div>
       </div>
@@ -177,7 +170,7 @@ export default function DietPlan() {
               {/* Meal header */}
               <button
                 onClick={() => setExpandedMeal(isOpen ? null : meal.key)}
-                className="w-full flex items-center gap-3 p-4 hover:bg-surface-700/30 active:bg-surface-700/50 transition-colors text-left"
+                className="tap-compact w-full flex items-center gap-3 p-4 hover:bg-surface-700/30 active:bg-surface-700/50 transition-colors text-left"
               >
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 transition-all ${
                   isDone ? 'bg-emerald-500/20' : 'bg-surface-700'
@@ -202,7 +195,7 @@ export default function DietPlan() {
 
                 <div className="flex items-center gap-2.5 flex-shrink-0">
                   {meal.macros && (
-                    <span className="text-xs text-orange-400 hidden sm:block">{meal.macros.cal} kcal</span>
+                    <span className="text-xs text-orange-400">{meal.macros.cal} kcal</span>
                   )}
                   {isOpen
                     ? <ChevronUp size={18} className="text-gray-400" />

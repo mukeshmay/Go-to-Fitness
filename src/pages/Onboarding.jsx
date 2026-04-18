@@ -161,7 +161,7 @@ export default function Onboarding() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-dvh bg-surface-950 flex flex-col">
+    <div className="min-h-dvh-safe bg-surface-950 flex flex-col">
       {/* Header */}
       <header className="flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-surface-700 flex-shrink-0">
         <div className="w-9 h-9 bg-brand-500 rounded-xl flex items-center justify-center">

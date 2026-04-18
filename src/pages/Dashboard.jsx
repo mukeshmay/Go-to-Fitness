@@ -1,6 +1,6 @@
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { CalendarDays, Salad, Target, Zap, TrendingUp, ChevronRight, Award, LogOut, User } from 'lucide-react'
+import { CalendarDays, Salad, Target, Zap, TrendingUp, ChevronRight, Award, LogOut } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 import BottomNav from '../components/BottomNav'
 import AppTour from '../components/AppTour'
@@ -9,6 +9,7 @@ import DietPlan from '../components/DietPlan'
 import Milestones from '../components/Milestones'
 import Records from './Records'
 import ProteinTracker from './ProteinTracker'
+import Profile from './Profile'
 import { useApp } from '../context/AppContext'
 
 const TODAY = new Date().toLocaleDateString('en-US', { weekday: 'long' })
@@ -43,7 +44,7 @@ function MobileHeader() {
       {/* Avatar button */}
       <button
         onClick={() => setMenuOpen(o => !o)}
-        className="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+        className="tap-compact w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
       >
         {initials}
       </button>
@@ -53,12 +54,19 @@ function MobileHeader() {
         <>
           {/* Backdrop */}
           <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-          <div className="absolute top-full right-4 mt-1 w-48 bg-surface-800 border border-surface-700 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
+          <div className="absolute top-full right-4 mt-1 w-52 bg-surface-800 border border-surface-700 rounded-xl shadow-xl z-50 overflow-hidden animate-fade-in">
             <div className="px-4 py-3 border-b border-surface-700">
               <p className="text-xs text-gray-500">Signed in as</p>
               <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
               <p className="text-xs text-gray-500 truncate">{user?.email}</p>
             </div>
+            <button
+              onClick={() => { setMenuOpen(false); navigate('/dashboard/profile') }}
+              className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-gray-300 hover:bg-surface-700 transition-colors text-left border-b border-surface-700/60"
+            >
+              <span className="text-base">👤</span>
+              View Profile
+            </button>
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
@@ -82,7 +90,7 @@ export default function Dashboard() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Mobile top bar */}
         <MobileHeader />
 
@@ -96,6 +104,7 @@ export default function Dashboard() {
               <Route path="milestones" element={<Milestones />} />
               <Route path="records"   element={<Records />} />
               <Route path="protein"  element={<ProteinTracker />} />
+              <Route path="profile"  element={<Profile />} />
             </Routes>
           </div>
         </main>
@@ -156,7 +165,7 @@ function Overview() {
         {/* Workout progress */}
         <button
           onClick={() => navigate('/dashboard/workout')}
-          className="card p-4 text-left hover:border-brand-500/40 active:bg-surface-700/60 transition-all"
+          className="tap-compact card p-4 text-left hover:border-brand-500/40 active:bg-surface-700/60 transition-all"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 bg-brand-600/20 rounded-lg flex items-center justify-center">
@@ -179,7 +188,7 @@ function Overview() {
         {/* Meals progress */}
         <button
           onClick={() => navigate('/dashboard/diet')}
-          className="card p-4 text-left hover:border-emerald-500/40 active:bg-surface-700/60 transition-all"
+          className="tap-compact card p-4 text-left hover:border-emerald-500/40 active:bg-surface-700/60 transition-all"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-9 h-9 bg-emerald-600/20 rounded-lg flex items-center justify-center">

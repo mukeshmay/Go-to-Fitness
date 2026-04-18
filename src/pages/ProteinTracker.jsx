@@ -152,11 +152,11 @@ export default function ProteinTracker() {
       {/* Veg toggle */}
       <div className="flex items-center justify-between card px-4 py-3">
         <span className="text-sm font-medium text-gray-300">
-          {isVeg ? '🥦 Showing vegetarian foods' : '🍗 Showing all foods (veg + non-veg)'}
+          {isVeg ? '🥦 Vegetarian foods' : '🍗 All foods (veg + non-veg)'}
         </span>
         <button
           onClick={() => setIsVeg(v => !v)}
-          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${isVeg ? 'bg-emerald-600' : 'bg-brand-600'}`}
+          className={`tap-compact relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-2 ${isVeg ? 'bg-emerald-600' : 'bg-brand-600'}`}
         >
           <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${isVeg ? 'translate-x-0.5' : 'translate-x-5'}`} />
         </button>
@@ -226,7 +226,7 @@ export default function ProteinTracker() {
             <h2 className="text-sm font-semibold text-white">Ways to hit your goal</h2>
             <button
               onClick={() => setIsVeg(v => !v)}
-              className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1"
+              className="tap-compact text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1 px-2 py-1"
             >
               {isVeg ? 'Switch to non-veg' : 'Switch to veg'}
             </button>
@@ -259,7 +259,7 @@ export default function ProteinTracker() {
               <div key={cat} className="card overflow-hidden">
                 <button
                   onClick={() => setExpandedCat(isOpen ? null : cat)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-surface-700/30 active:bg-surface-700/50 transition-colors"
+                  className="tap-compact w-full flex items-center justify-between px-4 py-3 hover:bg-surface-700/30 active:bg-surface-700/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-base">{catFoods[0].emoji}</span>
@@ -303,30 +303,27 @@ export default function ProteinTracker() {
 function FoodRow({ food, qty, onInc, onDec }) {
   const isAdded = qty > 0
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 transition-colors ${isAdded ? 'bg-brand-600/5' : ''}`}>
-      <span className="text-xl flex-shrink-0">{food.emoji}</span>
+    <div className={`flex items-center gap-2 px-3 py-2.5 transition-colors ${isAdded ? 'bg-brand-600/5' : ''}`}>
+      <span className="text-lg flex-shrink-0">{food.emoji}</span>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-white truncate">{food.name}</p>
-        <p className="text-xs text-gray-500">{food.serving}</p>
+        <p className="text-xs text-gray-500 truncate">{food.serving} · +{food.proteinPerUnit}g protein</p>
       </div>
-      <span className={`badge text-xs px-2 py-0.5 mr-1 flex-shrink-0 ${isAdded ? 'bg-brand-500/20 text-brand-300' : 'bg-surface-600 text-gray-400'}`}>
-        +{food.proteinPerUnit}g
-      </span>
       {/* Quantity selector */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1.5 flex-shrink-0">
         <button
           onClick={onDec}
           disabled={qty === 0}
-          className="w-7 h-7 rounded-full bg-surface-600 hover:bg-surface-500 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-white font-bold text-sm transition-colors active:scale-90"
+          className="w-9 h-9 rounded-full bg-surface-600 hover:bg-surface-500 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-white font-bold text-base transition-colors active:scale-90"
         >
           −
         </button>
-        <span className={`w-5 text-center text-sm font-bold ${qty > 0 ? 'text-brand-400' : 'text-gray-500'}`}>
+        <span className={`w-6 text-center text-sm font-bold ${qty > 0 ? 'text-brand-400' : 'text-gray-500'}`}>
           {qty}
         </span>
         <button
           onClick={onInc}
-          className="w-7 h-7 rounded-full bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white font-bold text-sm transition-colors active:scale-90"
+          className="w-9 h-9 rounded-full bg-brand-600 hover:bg-brand-500 flex items-center justify-center text-white font-bold text-base transition-colors active:scale-90"
         >
           +
         </button>

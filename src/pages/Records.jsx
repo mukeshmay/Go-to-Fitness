@@ -83,29 +83,28 @@ export default function Records() {
 
           {/* Weight progress bar */}
           <div className="card p-4 space-y-3">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between gap-2 mb-1">
               <div>
                 <p className="text-gray-400 text-xs">Current</p>
-                <p className="font-bold text-white text-lg">{target.currentWeight} kg</p>
-              </div>
-              <div className="flex-1 mx-4">
-                <div className="h-2 bg-surface-600 rounded-full overflow-hidden">
-                  {/* Progress toward target — visual only (shows effort, not actual weight change) */}
-                  <div
-                    className="h-full bg-gradient-to-r from-brand-600 to-cyan-500 rounded-full transition-all"
-                    style={{
-                      width: `${Math.min(100, Math.max(4, (target.totalPastDays / (target.adjustedWeeks * 7)) * 100))}%`
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>Day 0</span>
-                  <span>{target.adjustedWeeks}w</span>
-                </div>
+                <p className="font-bold text-white text-base">{target.currentWeight} kg</p>
               </div>
               <div className="text-right">
                 <p className="text-gray-400 text-xs">Target</p>
-                <p className="font-bold text-white text-lg">{target.targetWeight} kg</p>
+                <p className="font-bold text-white text-base">{target.targetWeight} kg</p>
+              </div>
+            </div>
+            <div>
+              <div className="h-2.5 bg-surface-600 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-brand-600 to-cyan-500 rounded-full transition-all"
+                  style={{
+                    width: `${Math.min(100, Math.max(4, (target.totalPastDays / (target.adjustedWeeks * 7)) * 100))}%`
+                  }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-gray-600 mt-1">
+                <span>Day 0</span>
+                <span>{target.adjustedWeeks} weeks</span>
               </div>
             </div>
 

@@ -8,30 +8,50 @@
     -webkit-tap-highlight-color: transparent;
   }
   html {
-    overflow-x: hidden;
+    /* Prevent horizontal scroll without breaking fixed positioning on Android */
+    overflow-x: clip;
+    height: 100%;
   }
   body {
     @apply bg-surface-950 text-gray-100 font-sans antialiased;
     scrollbar-width: thin;
     scrollbar-color: #30363d #0d1117;
-    overflow-x: hidden;
+    /* Prevent iOS text size adjustment when rotating */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* Prevent pull-to-refresh on Android Chrome / overscroll bounce */
+    overscroll-behavior-y: none;
+    min-height: 100%;
+    min-height: 100dvh;
   }
 
-  /* Prevent iOS Safari auto-zoom on input focus (requires font-size >= 16px) */
+  /* Prevent iOS Safari / Android Chrome auto-zoom on input focus.
+     Requires font-size >= 16px — do NOT reduce this. */
   input, select, textarea {
     font-size: 16px !important;
   }
 
-  /* Better touch scrolling on iOS */
+  /* Smooth momentum scrolling for scroll containers */
   .overflow-y-auto, main {
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
   }
 
-  /* Ensure buttons don't shrink tap area */
-  button {
+  /* Remove 300ms tap delay and prevent double-tap zoom on all buttons/links */
+  button, a, [role="button"] {
     touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  /* Minimum tap target size — avoids "too small to tap" on Android */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* Exceptions — purely decorative or layout elements */
+  button.tap-compact {
+    min-height: unset;
+    min-width: unset;
   }
   ::-webkit-scrollbar {
     width: 6px;
@@ -97,14 +117,23 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Safe area / iPhone home indicator ───────────────────────────────────── */
+/* ── Safe area (iPhone, Android gesture nav) ─────────────────────────────── */
 .bottom-nav-safe {
+  /* Fallback for browsers without env() support */
+  padding-bottom: 0px;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Dashboard main content — leave enough room for bottom nav + safe area */
+/* Dashboard main — leaves room for bottom nav + Android/iPhone gesture nav */
 .main-mobile-pad {
+  padding-bottom: 72px;
   padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+/* dvh fallback — use 100vh as base, override with 100dvh where supported */
+.min-h-dvh-safe {
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ── App Tour ─────────────────────────────────────────────────────────────── */

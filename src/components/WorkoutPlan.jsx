@@ -113,7 +113,7 @@ export default function WorkoutPlan() {
               {/* Day header — full tap area */}
               <button
                 onClick={() => setExpandedDay(isOpen ? null : day.day)}
-                className="w-full flex items-center gap-3 p-4 hover:bg-surface-700/30 active:bg-surface-700/50 transition-colors text-left"
+                className="tap-compact w-full flex items-center gap-3 p-4 hover:bg-surface-700/30 active:bg-surface-700/50 transition-colors text-left"
               >
                 {/* Day pill */}
                 <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0 text-xs font-bold ${
@@ -224,7 +224,7 @@ export default function WorkoutPlan() {
                             {exInfo && (
                               <button
                                 onClick={() => toggleExInfo(infoKey)}
-                                className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                                className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center transition-colors ${
                                   isInfoOpen ? 'bg-brand-600/30 text-brand-300' : 'text-gray-600 hover:text-gray-400 hover:bg-surface-600'
                                 }`}
                                 aria-label="Exercise info"

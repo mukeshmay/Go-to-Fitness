@@ -104,11 +104,10 @@ export default function Milestones() {
                 </div>
                 <button
                   onClick={() => undoMilestone(m.id)}
-                  className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 bg-surface-700 hover:bg-surface-600 border border-surface-600 hover:border-surface-500 text-gray-400 hover:text-white text-xs font-medium rounded-lg transition-all duration-150"
-                  title="Undo completion"
+                  className="flex-shrink-0 flex items-center gap-1.5 px-2.5 py-2 bg-surface-700 hover:bg-surface-600 border border-surface-600 hover:border-surface-500 text-gray-400 hover:text-white text-xs font-medium rounded-lg transition-all duration-150"
                 >
                   <Undo2 size={13} />
-                  <span className="hidden sm:inline">Undo</span>
+                  Undo
                 </button>
               </div>
             ))}
@@ -150,10 +149,10 @@ function MilestoneCard({ milestone, onComplete }) {
 
       <button
         onClick={onComplete}
-        className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 bg-brand-600/20 hover:bg-brand-600 border border-brand-500/40 hover:border-brand-500 text-brand-300 hover:text-white text-xs font-semibold rounded-lg transition-all duration-200 group-hover:scale-105"
+        className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2.5 bg-brand-600/20 hover:bg-brand-600 border border-brand-500/40 hover:border-brand-500 text-brand-300 hover:text-white text-xs font-semibold rounded-lg transition-all duration-200"
       >
         <Check size={14} />
-        <span className="hidden sm:inline">Done</span>
+        Done
       </button>
     </div>
   )
