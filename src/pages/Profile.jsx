@@ -1,10 +1,31 @@
 import { useApp } from '../context/AppContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
   User, Mail, Weight, Ruler, CalendarDays, Target, Salad,
   Dumbbell, Zap, Heart, TrendingUp, LogOut, RefreshCw,
-  Flame, Activity,
+  Flame, Activity, Shield,
 } from 'lucide-react'
+
+const PLAN_LABELS = {
+  monthly:     'Monthly',
+  quarterly:   'Quarterly',
+  half_yearly: 'Half Yearly',
+  yearly:      'Yearly',
+}
+
+function getSubStatus(sub) {
+  if (!sub?.plan) return null
+  const now = new Date(), end = sub.endDate ? new Date(sub.endDate) : null
+  if (!end || end < now) return { label: 'Expired', cls: 'text-red-400', bg: 'bg-red-500/15 border-red-500/30' }
+  const d = Math.ceil((end - now) / 86400000)
+  if (d <= 7) return { label: `${d} days left`, cls: 'text-orange-400', bg: 'bg-orange-500/15 border-orange-500/30' }
+  return { label: 'Active', cls: 'text-emerald-400', bg: 'bg-emerald-500/15 border-emerald-500/30' }
+}
+
+function fmtDate(d) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+}
 
 const GOAL_LABELS = {
   muscle_gain: { label: 'Muscle Gain',  emoji: '💪', color: 'text-brand-400',   bg: 'bg-brand-500/15 border-brand-500/30' },
@@ -82,6 +103,15 @@ export default function Profile() {
   const bmiInfo  = getBMIInfo(bmi)
   const goalInfo = GOAL_LABELS[goals.primaryGoal] || GOAL_LABELS.muscle_gain
 
+  // Read subscription directly from localStorage (AppContext doesn't track it yet)
+  const sub = (() => {
+    try {
+      const all = JSON.parse(localStorage.getItem('gtf_user_data') || '{}')
+      return all[user?.email]?.subscription || null
+    } catch { return null }
+  })()
+  const subStatus = getSubStatus(sub)
+
   const memberSince = profile.createdAt
     ? new Date(profile.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
     : '—'
@@ -116,6 +146,38 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* ── Subscription card ──────────────────────────────────────────────── */}
+      {subStatus ? (
+        <div className={`card p-4 border flex items-center justify-between ${subStatus.bg}`}>
+          <div className="flex items-center gap-3">
+            <Shield size={18} className={subStatus.cls} />
+            <div>
+              <p className="text-xs text-gray-400">Subscription</p>
+              <p className={`font-bold text-sm ${subStatus.cls}`}>
+                {PLAN_LABELS[sub.plan]} Plan · {subStatus.label}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">Expires</p>
+            <p className="text-xs font-medium text-white">{fmtDate(sub.endDate)}</p>
+          </div>
+        </div>
+      ) : (
+        <div className="card p-4 border border-surface-600 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Shield size={18} className="text-gray-500" />
+            <div>
+              <p className="text-xs text-gray-500">No active subscription</p>
+              <p className="text-xs text-gray-600 mt-0.5">Contact your gym to subscribe</p>
+            </div>
+          </div>
+          <Link to="/pricing" className="text-xs text-brand-400 hover:text-brand-300 font-medium">
+            View plans →
+          </Link>
+        </div>
+      )}
 
       {/* ── Goal badge ─────────────────────────────────────────────────────── */}
       <div className={`card p-4 border flex items-center gap-3 ${goalInfo.bg}`}>

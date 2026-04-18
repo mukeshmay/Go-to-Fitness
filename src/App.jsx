@@ -4,6 +4,10 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
+import Pricing from './pages/Pricing'
+import AdminLogin, { isAdminLoggedIn } from './pages/admin/AdminLogin'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminUserEdit from './pages/admin/AdminUserEdit'
 
 function RequireAuth({ children }) {
   const { user } = useApp()
@@ -18,39 +22,32 @@ function RequireProfile({ children }) {
   return children
 }
 
+function RequireAdmin({ children }) {
+  if (!isAdminLoggedIn()) return <Navigate to="/admin" replace />
+  return children
+}
+
 function AppRoutes() {
   const { user, profile } = useApp()
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={user ? <Navigate to={profile ? '/dashboard' : '/onboarding'} replace /> : <Login />}
-      />
-      <Route
-        path="/signup"
-        element={user ? <Navigate to={profile ? '/dashboard' : '/onboarding'} replace /> : <Signup />}
-      />
-      <Route
-        path="/onboarding"
-        element={
-          <RequireAuth>
-            <Onboarding />
-          </RequireAuth>
-        }
-      />
-      <Route
-        path="/dashboard/*"
-        element={
-          <RequireProfile>
-            <Dashboard />
-          </RequireProfile>
-        }
-      />
-      <Route
-        path="*"
-        element={<Navigate to={user ? (profile ? '/dashboard' : '/onboarding') : '/login'} replace />}
-      />
+      {/* Public */}
+      <Route path="/login"   element={user ? <Navigate to={profile ? '/dashboard' : '/onboarding'} replace /> : <Login />} />
+      <Route path="/signup"  element={user ? <Navigate to={profile ? '/dashboard' : '/onboarding'} replace /> : <Signup />} />
+      <Route path="/pricing" element={<Pricing />} />
+
+      {/* Admin */}
+      <Route path="/admin"                  element={isAdminLoggedIn() ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />} />
+      <Route path="/admin/dashboard"        element={<RequireAdmin><AdminDashboard /></RequireAdmin>} />
+      <Route path="/admin/user/:email"      element={<RequireAdmin><AdminUserEdit /></RequireAdmin>} />
+
+      {/* User app */}
+      <Route path="/onboarding" element={<RequireAuth><Onboarding /></RequireAuth>} />
+      <Route path="/dashboard/*" element={<RequireProfile><Dashboard /></RequireProfile>} />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to={user ? (profile ? '/dashboard' : '/onboarding') : '/login'} replace />} />
     </Routes>
   )
 }

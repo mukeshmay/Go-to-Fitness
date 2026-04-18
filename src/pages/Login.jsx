@@ -168,6 +168,11 @@ export default function Login() {
               Create one free
             </Link>
           </p>
+          <p className="text-center text-xs text-gray-600 mt-3">
+            <Link to="/pricing" className="hover:text-gray-400 transition-colors">View subscription plans</Link>
+            {' · '}
+            <Link to="/admin" className="hover:text-gray-400 transition-colors">Gym admin</Link>
+          </p>
         </div>
       </div>
     </div>
